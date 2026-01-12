@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const port = process.env.port || 3000;
 
@@ -28,13 +28,27 @@ async function run() {
     const parcelsCollection = db.collection("parcel");
 
     app.get("/parcels", async (req, res) => {
-        const result = await parcelsCollection.find().toArray();
-        res.send(result)
+      const query = {};
+      const email = req.query.email;
+      if (email) {
+        query.senderEmail = email;
+      }
+      const options = { sort: { createdAt: -1 } };
+      const cursor = parcelsCollection.find(query, options);
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     app.post("/parcels", async (req, res) => {
       const parcel = req.body;
       const result = await parcelsCollection.insertOne(parcel);
+      res.send(result);
+    });
+
+    app.get("/parcel/:id", async (req, res) => {
+      const { id } = req.params;
+      const objectId = new ObjectId(id);
+      const result = await parcelsCollection.findOne({ _id: objectId });
       res.send(result);
     });
 

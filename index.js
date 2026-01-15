@@ -27,6 +27,12 @@ async function run() {
     const db = client.db("zap_shift_db");
     const parcelsCollection = db.collection("parcel");
 
+    app.post("/parcels", async (req, res) => {
+      const parcel = req.body;
+      const result = await parcelsCollection.insertOne(parcel);
+      res.send(result);
+    });
+
     app.get("/parcels", async (req, res) => {
       const query = {};
       const email = req.query.email;
@@ -39,16 +45,17 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/parcels", async (req, res) => {
-      const parcel = req.body;
-      const result = await parcelsCollection.insertOne(parcel);
-      res.send(result);
-    });
-
     app.get("/parcel/:id", async (req, res) => {
       const { id } = req.params;
       const objectId = new ObjectId(id);
       const result = await parcelsCollection.findOne({ _id: objectId });
+      res.send(result);
+    });
+
+    app.delete("/parcel/:id", async (req, res) => {
+      const { id } = req.params;
+      const objectId = new ObjectId(id);
+      const result = await parcelsCollection.deleteOne({ _id: objectId });
       res.send(result);
     });
 

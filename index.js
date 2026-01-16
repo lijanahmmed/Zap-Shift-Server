@@ -52,6 +52,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/parcel/:id", async (req, res) => {
+      const { id } = req.params;
+      const objectId = new ObjectId(id);
+      const result = await parcelsCollection.findOne(objectId);
+      res.send(result);
+    });
+
     app.delete("/parcel/:id", async (req, res) => {
       const { id } = req.params;
       const objectId = new ObjectId(id);
